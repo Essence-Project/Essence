@@ -1,0 +1,1485 @@
+{
+  "contractName": "MintableTokenFundraiser",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_beneficiary",
+          "type": "address"
+        }
+      ],
+      "name": "setBeneficiary",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "endTime",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "beneficiary",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "startTime",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "acceptOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "conversionRate",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "totalRaised",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_conversionRate",
+          "type": "uint256"
+        }
+      ],
+      "name": "setConversionRate",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "newOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "hasEnded",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getConversionRate",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "fallback"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_conversionRate",
+          "type": "uint256"
+        }
+      ],
+      "name": "ConversionRateChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_address",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_ethers",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "_tokens",
+          "type": "uint256"
+        }
+      ],
+      "name": "FundsReceived",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "_oldOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransfer",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.21;\n\nimport \"./BasicFundraiser.sol\";\nimport \"../token/MintableToken.sol\";\nimport \"../token/StandardMintableToken.sol\";\n\n/**\n * @title Fundraiser With Mintable Token\n */\ncontract MintableTokenFundraiser is BasicFundraiser {\n    /**\n     * @dev The initialization method that creates a new mintable token.\n     *\n     * @param _name Token name\n     * @param _symbol Token symbol\n     * @param _decimals Token decimals\n     */\n    function initializeMintableTokenFundraiser(string _name, string _symbol, uint8 _decimals) internal {\n        token = new StandardMintableToken(\n            address(this), // The fundraiser is the token minter\n            _name,\n            _symbol,\n            _decimals\n        );\n    }\n\n    /**\n     * @dev Mint the specific amount tokens\n     */\n    function handleTokens(address _address, uint256 _tokens) internal {\n        MintableToken(token).mint(_address, _tokens);\n    }\n}",
+  "sourcePath": "/tmp/tg-build-DFPcbO/contracts/fundraiser/MintableTokenFundraiser.sol",
+  "ast": {
+    "absolutePath": "/tmp/tg-build-DFPcbO/contracts/fundraiser/MintableTokenFundraiser.sol",
+    "exportedSymbols": {
+      "MintableTokenFundraiser": [
+        1268
+      ]
+    },
+    "id": 1269,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1224,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".21"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:10"
+      },
+      {
+        "absolutePath": "/tmp/tg-build-DFPcbO/contracts/fundraiser/BasicFundraiser.sol",
+        "file": "./BasicFundraiser.sol",
+        "id": 1225,
+        "nodeType": "ImportDirective",
+        "scope": 1269,
+        "sourceUnit": 875,
+        "src": "26:31:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/tmp/tg-build-DFPcbO/contracts/token/MintableToken.sol",
+        "file": "../token/MintableToken.sol",
+        "id": 1226,
+        "nodeType": "ImportDirective",
+        "scope": 1269,
+        "sourceUnit": 1910,
+        "src": "58:36:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/tmp/tg-build-DFPcbO/contracts/token/StandardMintableToken.sol",
+        "file": "../token/StandardMintableToken.sol",
+        "id": 1227,
+        "nodeType": "ImportDirective",
+        "scope": 1269,
+        "sourceUnit": 1936,
+        "src": "95:44:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 1228,
+              "name": "BasicFundraiser",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 874,
+              "src": "226:15:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BasicFundraiser_$874",
+                "typeString": "contract BasicFundraiser"
+              }
+            },
+            "id": 1229,
+            "nodeType": "InheritanceSpecifier",
+            "src": "226:15:10"
+          }
+        ],
+        "contractDependencies": [
+          644,
+          874,
+          1935,
+          2230
+        ],
+        "contractKind": "contract",
+        "documentation": "@title Fundraiser With Mintable Token",
+        "fullyImplemented": false,
+        "id": 1268,
+        "linearizedBaseContracts": [
+          1268,
+          874,
+          644,
+          2230
+        ],
+        "name": "MintableTokenFundraiser",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1250,
+              "nodeType": "Block",
+              "src": "548:188:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 1248,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 1238,
+                      "name": "token",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 578,
+                      "src": "558:5:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                        "typeString": "contract ERC20Token"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "id": 1242,
+                              "name": "this",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 2278,
+                              "src": "613:4:10",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_MintableTokenFundraiser_$1268",
+                                "typeString": "contract MintableTokenFundraiser"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_contract$_MintableTokenFundraiser_$1268",
+                                "typeString": "contract MintableTokenFundraiser"
+                              }
+                            ],
+                            "id": 1241,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "605:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 1243,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "605:13:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 1244,
+                          "name": "_name",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1231,
+                          "src": "670:5:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 1245,
+                          "name": "_symbol",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1233,
+                          "src": "689:7:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 1246,
+                          "name": "_decimals",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1235,
+                          "src": "710:9:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint8",
+                            "typeString": "uint8"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          },
+                          {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          },
+                          {
+                            "typeIdentifier": "t_uint8",
+                            "typeString": "uint8"
+                          }
+                        ],
+                        "id": 1240,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "NewExpression",
+                        "src": "566:25:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_creation_nonpayable$_t_address_$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_uint8_$returns$_t_contract$_StandardMintableToken_$1935_$",
+                          "typeString": "function (address,string memory,string memory,uint8) returns (contract StandardMintableToken)"
+                        },
+                        "typeName": {
+                          "contractScope": null,
+                          "id": 1239,
+                          "name": "StandardMintableToken",
+                          "nodeType": "UserDefinedTypeName",
+                          "referencedDeclaration": 1935,
+                          "src": "570:21:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_StandardMintableToken_$1935",
+                            "typeString": "contract StandardMintableToken"
+                          }
+                        }
+                      },
+                      "id": 1247,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "566:163:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_StandardMintableToken_$1935",
+                        "typeString": "contract StandardMintableToken"
+                      }
+                    },
+                    "src": "558:171:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                      "typeString": "contract ERC20Token"
+                    }
+                  },
+                  "id": 1249,
+                  "nodeType": "ExpressionStatement",
+                  "src": "558:171:10"
+                }
+              ]
+            },
+            "documentation": "@dev The initialization method that creates a new mintable token.\n     * @param _name Token name\n@param _symbol Token symbol\n@param _decimals Token decimals",
+            "id": 1251,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "initializeMintableTokenFundraiser",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1236,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1231,
+                  "name": "_name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1251,
+                  "src": "492:12:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1230,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "492:6:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1233,
+                  "name": "_symbol",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1251,
+                  "src": "506:14:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1232,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "506:6:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1235,
+                  "name": "_decimals",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1251,
+                  "src": "522:15:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 1234,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "522:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "491:47:10"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1237,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "548:0:10"
+            },
+            "scope": 1268,
+            "src": "449:287:10",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 1266,
+              "nodeType": "Block",
+              "src": "868:61:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 1262,
+                        "name": "_address",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1253,
+                        "src": "904:8:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 1263,
+                        "name": "_tokens",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1255,
+                        "src": "914:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 1259,
+                            "name": "token",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 578,
+                            "src": "892:5:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                              "typeString": "contract ERC20Token"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                              "typeString": "contract ERC20Token"
+                            }
+                          ],
+                          "id": 1258,
+                          "name": "MintableToken",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1909,
+                          "src": "878:13:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_MintableToken_$1909_$",
+                            "typeString": "type(contract MintableToken)"
+                          }
+                        },
+                        "id": 1260,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "878:20:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_MintableToken_$1909",
+                          "typeString": "contract MintableToken"
+                        }
+                      },
+                      "id": 1261,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "mint",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 1893,
+                      "src": "878:25:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256) external"
+                      }
+                    },
+                    "id": 1264,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "878:44:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 1265,
+                  "nodeType": "ExpressionStatement",
+                  "src": "878:44:10"
+                }
+              ]
+            },
+            "documentation": "@dev Mint the specific amount tokens",
+            "id": 1267,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "handleTokens",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1256,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1253,
+                  "name": "_address",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1267,
+                  "src": "824:16:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1252,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "824:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1255,
+                  "name": "_tokens",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1267,
+                  "src": "842:15:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1254,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "842:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "823:35:10"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1257,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "868:0:10"
+            },
+            "scope": 1268,
+            "src": "802:127:10",
+            "stateMutability": "nonpayable",
+            "superFunction": 636,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 1269,
+        "src": "190:741:10"
+      }
+    ],
+    "src": "0:931:10"
+  },
+  "legacyAST": {
+    "absolutePath": "/tmp/tg-build-DFPcbO/contracts/fundraiser/MintableTokenFundraiser.sol",
+    "exportedSymbols": {
+      "MintableTokenFundraiser": [
+        1268
+      ]
+    },
+    "id": 1269,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1224,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".21"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:10"
+      },
+      {
+        "absolutePath": "/tmp/tg-build-DFPcbO/contracts/fundraiser/BasicFundraiser.sol",
+        "file": "./BasicFundraiser.sol",
+        "id": 1225,
+        "nodeType": "ImportDirective",
+        "scope": 1269,
+        "sourceUnit": 875,
+        "src": "26:31:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/tmp/tg-build-DFPcbO/contracts/token/MintableToken.sol",
+        "file": "../token/MintableToken.sol",
+        "id": 1226,
+        "nodeType": "ImportDirective",
+        "scope": 1269,
+        "sourceUnit": 1910,
+        "src": "58:36:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/tmp/tg-build-DFPcbO/contracts/token/StandardMintableToken.sol",
+        "file": "../token/StandardMintableToken.sol",
+        "id": 1227,
+        "nodeType": "ImportDirective",
+        "scope": 1269,
+        "sourceUnit": 1936,
+        "src": "95:44:10",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 1228,
+              "name": "BasicFundraiser",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 874,
+              "src": "226:15:10",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_BasicFundraiser_$874",
+                "typeString": "contract BasicFundraiser"
+              }
+            },
+            "id": 1229,
+            "nodeType": "InheritanceSpecifier",
+            "src": "226:15:10"
+          }
+        ],
+        "contractDependencies": [
+          644,
+          874,
+          1935,
+          2230
+        ],
+        "contractKind": "contract",
+        "documentation": "@title Fundraiser With Mintable Token",
+        "fullyImplemented": false,
+        "id": 1268,
+        "linearizedBaseContracts": [
+          1268,
+          874,
+          644,
+          2230
+        ],
+        "name": "MintableTokenFundraiser",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1250,
+              "nodeType": "Block",
+              "src": "548:188:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 1248,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 1238,
+                      "name": "token",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 578,
+                      "src": "558:5:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                        "typeString": "contract ERC20Token"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "id": 1242,
+                              "name": "this",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 2278,
+                              "src": "613:4:10",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_MintableTokenFundraiser_$1268",
+                                "typeString": "contract MintableTokenFundraiser"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_contract$_MintableTokenFundraiser_$1268",
+                                "typeString": "contract MintableTokenFundraiser"
+                              }
+                            ],
+                            "id": 1241,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "605:7:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 1243,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "605:13:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 1244,
+                          "name": "_name",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1231,
+                          "src": "670:5:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 1245,
+                          "name": "_symbol",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1233,
+                          "src": "689:7:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 1246,
+                          "name": "_decimals",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1235,
+                          "src": "710:9:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint8",
+                            "typeString": "uint8"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          },
+                          {
+                            "typeIdentifier": "t_string_memory_ptr",
+                            "typeString": "string memory"
+                          },
+                          {
+                            "typeIdentifier": "t_uint8",
+                            "typeString": "uint8"
+                          }
+                        ],
+                        "id": 1240,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "NewExpression",
+                        "src": "566:25:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_creation_nonpayable$_t_address_$_t_string_memory_ptr_$_t_string_memory_ptr_$_t_uint8_$returns$_t_contract$_StandardMintableToken_$1935_$",
+                          "typeString": "function (address,string memory,string memory,uint8) returns (contract StandardMintableToken)"
+                        },
+                        "typeName": {
+                          "contractScope": null,
+                          "id": 1239,
+                          "name": "StandardMintableToken",
+                          "nodeType": "UserDefinedTypeName",
+                          "referencedDeclaration": 1935,
+                          "src": "570:21:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_StandardMintableToken_$1935",
+                            "typeString": "contract StandardMintableToken"
+                          }
+                        }
+                      },
+                      "id": 1247,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "566:163:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_StandardMintableToken_$1935",
+                        "typeString": "contract StandardMintableToken"
+                      }
+                    },
+                    "src": "558:171:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                      "typeString": "contract ERC20Token"
+                    }
+                  },
+                  "id": 1249,
+                  "nodeType": "ExpressionStatement",
+                  "src": "558:171:10"
+                }
+              ]
+            },
+            "documentation": "@dev The initialization method that creates a new mintable token.\n     * @param _name Token name\n@param _symbol Token symbol\n@param _decimals Token decimals",
+            "id": 1251,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "initializeMintableTokenFundraiser",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1236,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1231,
+                  "name": "_name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1251,
+                  "src": "492:12:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1230,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "492:6:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1233,
+                  "name": "_symbol",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1251,
+                  "src": "506:14:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1232,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "506:6:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1235,
+                  "name": "_decimals",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1251,
+                  "src": "522:15:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 1234,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "522:5:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "491:47:10"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1237,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "548:0:10"
+            },
+            "scope": 1268,
+            "src": "449:287:10",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 1266,
+              "nodeType": "Block",
+              "src": "868:61:10",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 1262,
+                        "name": "_address",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1253,
+                        "src": "904:8:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 1263,
+                        "name": "_tokens",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1255,
+                        "src": "914:7:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 1259,
+                            "name": "token",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 578,
+                            "src": "892:5:10",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                              "typeString": "contract ERC20Token"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_ERC20Token_$1815",
+                              "typeString": "contract ERC20Token"
+                            }
+                          ],
+                          "id": 1258,
+                          "name": "MintableToken",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1909,
+                          "src": "878:13:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_MintableToken_$1909_$",
+                            "typeString": "type(contract MintableToken)"
+                          }
+                        },
+                        "id": 1260,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "878:20:10",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_MintableToken_$1909",
+                          "typeString": "contract MintableToken"
+                        }
+                      },
+                      "id": 1261,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "mint",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 1893,
+                      "src": "878:25:10",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256) external"
+                      }
+                    },
+                    "id": 1264,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "878:44:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 1265,
+                  "nodeType": "ExpressionStatement",
+                  "src": "878:44:10"
+                }
+              ]
+            },
+            "documentation": "@dev Mint the specific amount tokens",
+            "id": 1267,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "handleTokens",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1256,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1253,
+                  "name": "_address",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1267,
+                  "src": "824:16:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1252,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "824:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1255,
+                  "name": "_tokens",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1267,
+                  "src": "842:15:10",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1254,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "842:7:10",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "823:35:10"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1257,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "868:0:10"
+            },
+            "scope": 1268,
+            "src": "802:127:10",
+            "stateMutability": "nonpayable",
+            "superFunction": 636,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 1269,
+        "src": "190:741:10"
+      }
+    ],
+    "src": "0:931:10"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-12-13T06:56:18.545Z"
+}
